@@ -9,6 +9,7 @@ import { CheckIf } from "src/checkif";
 import { CodeBlockGenerator } from "src/code_block_generator";
 import { CodeBlockProcessor } from "src/code_block_processor";
 import { EditorExtensions } from "src/editor_enhancements";
+import { i18n } from "src/lang/i18n";
 import { linkRegex } from "src/regex";
 import {
 	DEFAULT_SETTINGS,
@@ -29,7 +30,7 @@ export default class ObsidianAutoCardLink extends Plugin {
 
 		this.addCommand({
 			id: "auto-card-link-paste-and-enhance",
-			name: "Paste URL and enhance to card link",
+			name: i18n.commands.pasteAndEnhance,
 			editorCallback: async (editor: Editor) => {
 				await this.manualPasteAndEnhanceURL(editor);
 			},
@@ -38,7 +39,7 @@ export default class ObsidianAutoCardLink extends Plugin {
 
 		this.addCommand({
 			id: "auto-card-link-enhance-selected-url",
-			name: "Enhance selected URL to card link",
+			name: i18n.commands.enhanceSelected,
 			editorCheckCallback: (checking: boolean, editor: Editor) => {
 				// if offline, not showing command
 				if (!navigator.onLine) return false;
@@ -146,7 +147,7 @@ export default class ObsidianAutoCardLink extends Plugin {
 
 		menu.addItem((item: MenuItem) => {
 			item
-				.setTitle("Paste URL and enhance to card link")
+				.setTitle(i18n.commands.pasteAndEnhance)
 				.setIcon("paste")
 				.onClick(async () => {
 					const editor = this.getEditor();
@@ -155,12 +156,12 @@ export default class ObsidianAutoCardLink extends Plugin {
 				});
 		});
 
-		// if offline, not showing "Enhance selected URL to card link" item
+		// if offline, not showing enhance selected URL item
 		if (!navigator.onLine) return;
 
 		menu.addItem((item: MenuItem) => {
 			item
-				.setTitle("Enhance selected URL to card link")
+				.setTitle(i18n.commands.enhanceSelected)
 				.setIcon("link")
 				.onClick(() => {
 					const editor = this.getEditor();

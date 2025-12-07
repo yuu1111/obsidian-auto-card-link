@@ -1,5 +1,6 @@
 import { type App, PluginSettingTab, Setting } from "obsidian";
 
+import { i18n } from "src/lang/i18n";
 import type ObsidianAutoCardLink from "src/main";
 
 export interface ObsidianAutoCardLinkSettings {
@@ -26,10 +27,8 @@ export class ObsidianAutoCardLinkSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName("Enhance Default Paste")
-			.setDesc(
-				"Fetch the link metadata when pasting a url in the editor with the default paste command",
-			)
+			.setName(i18n.settings.enhanceDefaultPaste.name)
+			.setDesc(i18n.settings.enhanceDefaultPaste.desc)
 			.addToggle((val) => {
 				if (!this.plugin.settings) return;
 				return val
@@ -42,8 +41,8 @@ export class ObsidianAutoCardLinkSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName("Add commands in menu item")
-			.setDesc("Whether to add commands in right click menu items")
+			.setName(i18n.settings.showInMenuItem.name)
+			.setDesc(i18n.settings.showInMenuItem.desc)
 			.addToggle((val) => {
 				if (!this.plugin.settings) return;
 				return val
