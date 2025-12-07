@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Processor for rendering cardlink code blocks in preview mode.
+ * @module code_block_processor
+ */
+
 import {
 	type App,
 	ButtonComponent,
@@ -10,13 +15,26 @@ import { NoRequiredParamsError, YamlParseError } from "src/errors";
 import type { LinkMetadata } from "src/interfaces";
 import { CheckIf } from "./checkif";
 
+/**
+ * Processes cardlink code blocks and renders them as styled card elements.
+ */
 export class CodeBlockProcessor {
+	/** Reference to the Obsidian App instance */
 	app: App;
 
+	/**
+	 * Creates a new CodeBlockProcessor.
+	 * @param app - The Obsidian App instance
+	 */
 	constructor(app: App) {
 		this.app = app;
 	}
 
+	/**
+	 * Processes the cardlink code block source and renders it.
+	 * @param source - The YAML source content of the code block
+	 * @param el - The HTML element to render into
+	 */
 	async run(source: string, el: HTMLElement) {
 		try {
 			const data = this.parseLinkMetadataFromYaml(source);
@@ -37,6 +55,14 @@ export class CodeBlockProcessor {
 		}
 	}
 
+	/**
+	 * Parses YAML content into LinkMetadata.
+	 * Handles tab-to-space conversion for YAML compatibility.
+	 * @param source - The raw YAML source string
+	 * @returns Parsed link metadata
+	 * @throws {YamlParseError} When YAML parsing fails
+	 * @throws {NoRequiredParamsError} When required fields are missing
+	 */
 	private parseLinkMetadataFromYaml(source: string): LinkMetadata {
 		let yaml: Partial<LinkMetadata>;
 
@@ -80,6 +106,11 @@ export class CodeBlockProcessor {
 		};
 	}
 
+	/**
+	 * Generates an error display element.
+	 * @param errorMsg - The error message to display
+	 * @returns HTML element showing the error
+	 */
 	private genErrorEl(errorMsg: string): HTMLElement {
 		const containerEl = document.createElement("div");
 		containerEl.addClass("auto-card-link-error-container");
@@ -91,6 +122,12 @@ export class CodeBlockProcessor {
 		return containerEl;
 	}
 
+	/**
+	 * Generates the card link HTML element from metadata.
+	 * Creates a styled card with title, description, favicon, and thumbnail.
+	 * @param data - The link metadata to render
+	 * @returns The complete card HTML element
+	 */
 	private genLinkEl(data: LinkMetadata): HTMLElement {
 		const containerEl = document.createElement("div");
 		containerEl.addClass("auto-card-link-container");
@@ -161,6 +198,11 @@ export class CodeBlockProcessor {
 		return containerEl;
 	}
 
+	/**
+	 * Resolves an internal Obsidian link to a resource path.
+	 * @param link - The internal link in `[[filename]]` format
+	 * @returns The resolved resource path or the original link if not found
+	 */
 	private getLocalImagePath(link: string): string {
 		link = link.slice(2, -2); // remove [[]]
 		const imageRelativePath = this.app.metadataCache.getFirstLinkpathDest(

@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Main plugin entry point for Auto Card Link.
+ * @module main
+ */
+
 import {
 	type Editor,
 	MarkdownView,
@@ -17,9 +22,19 @@ import {
 	ObsidianAutoCardLinkSettingTab,
 } from "src/settings";
 
+/**
+ * Main plugin class for Auto Card Link.
+ * Automatically fetches metadata from URLs and creates card-styled links.
+ * @extends Plugin
+ */
 export default class ObsidianAutoCardLink extends Plugin {
+	/** Plugin settings */
 	settings?: ObsidianAutoCardLinkSettings;
 
+	/**
+	 * Called when the plugin is loaded.
+	 * Registers commands, event handlers, and settings.
+	 */
 	async onload() {
 		await this.loadSettings();
 
@@ -63,6 +78,11 @@ export default class ObsidianAutoCardLink extends Plugin {
 		this.addSettingTab(new ObsidianAutoCardLinkSettingTab(this.app, this));
 	}
 
+	/**
+	 * Converts selected URL(s) to card link code blocks.
+	 * Handles both plain URLs and Markdown-formatted links.
+	 * @param editor - The Obsidian editor instance
+	 */
 	private enhanceSelectedURL(editor: Editor): void {
 		const selectedText = (
 			EditorExtensions.getSelectedText(editor) || ""
@@ -80,6 +100,11 @@ export default class ObsidianAutoCardLink extends Plugin {
 		}
 	}
 
+	/**
+	 * Pastes clipboard content and converts URL to card link if applicable.
+	 * Falls back to normal paste for non-URLs or offline mode.
+	 * @param editor - The Obsidian editor instance
+	 */
 	private async manualPasteAndEnhanceURL(editor: Editor): Promise<void> {
 		// if no clipboardText, do nothing
 		const clipboardText = await navigator.clipboard.readText();
@@ -107,6 +132,12 @@ export default class ObsidianAutoCardLink extends Plugin {
 		return;
 	}
 
+	/**
+	 * Handles paste events to automatically convert URLs to card links.
+	 * Only active when enhanceDefaultPaste setting is enabled.
+	 * @param evt - The clipboard event
+	 * @param editor - The Obsidian editor instance
+	 */
 	private onPaste = async (
 		evt: ClipboardEvent,
 		editor: Editor,
@@ -141,6 +172,10 @@ export default class ObsidianAutoCardLink extends Plugin {
 		return;
 	};
 
+	/**
+	 * Adds card link commands to the editor context menu.
+	 * @param menu - The context menu to add items to
+	 */
 	private onEditorMenu = (menu: Menu) => {
 		// if showInMenuItem setting is false, now showing menu item
 		if (!this.settings?.showInMenuItem) return;
@@ -173,12 +208,21 @@ export default class ObsidianAutoCardLink extends Plugin {
 		return;
 	};
 
+	/**
+	 * Gets the active editor instance.
+	 * @returns The editor instance or undefined if no active view
+	 */
 	private getEditor(): Editor | undefined {
 		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 		if (!view) return;
 		return view.editor;
 	}
 
+	/**
+	 * Extracts the URL from a Markdown link.
+	 * @param link - The Markdown link in `[text](url)` format
+	 * @returns The extracted URL or empty string if not found
+	 */
 	private getUrlFromLink(link: string): string {
 		const urlRegex = new RegExp(linkRegex);
 		const regExpExecArray = urlRegex.exec(link);
@@ -188,14 +232,23 @@ export default class ObsidianAutoCardLink extends Plugin {
 		return regExpExecArray[2];
 	}
 
+	/**
+	 * Called when the plugin is unloaded.
+	 */
 	onunload() {
 		console.log("unloading auto-card-link");
 	}
 
+	/**
+	 * Loads plugin settings from storage.
+	 */
 	private async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
 
+	/**
+	 * Saves plugin settings to storage.
+	 */
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}

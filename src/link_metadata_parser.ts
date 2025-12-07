@@ -1,9 +1,24 @@
+/**
+ * @fileoverview Parser for extracting metadata from HTML pages.
+ * @module link_metadata_parser
+ */
+
 import type { LinkMetadata } from "src/interfaces";
 
+/**
+ * Parses HTML content to extract link metadata (title, description, images, etc.).
+ */
 export class LinkMetadataParser {
+	/** The original URL being parsed */
 	url: string;
+	/** The parsed HTML document */
 	htmlDoc: Document;
 
+	/**
+	 * Creates a new LinkMetadataParser.
+	 * @param url - The URL of the page
+	 * @param htmlText - The raw HTML content to parse
+	 */
 	constructor(url: string, htmlText: string) {
 		this.url = url;
 
@@ -12,6 +27,10 @@ export class LinkMetadataParser {
 		this.htmlDoc = htmlDoc;
 	}
 
+	/**
+	 * Parses the HTML document and extracts link metadata.
+	 * @returns The extracted metadata or undefined if title is not found
+	 */
 	async parse(): Promise<LinkMetadata | undefined> {
 		const title = this.getTitle()
 			?.replace(/\r\n|\n|\r/g, "")
@@ -40,6 +59,10 @@ export class LinkMetadataParser {
 		};
 	}
 
+	/**
+	 * Extracts the page title from Open Graph meta tag or title element.
+	 * @returns The page title or undefined if not found
+	 */
 	private getTitle(): string | undefined {
 		const ogTitle = this.htmlDoc
 			.querySelector("meta[property='og:title']")
@@ -50,6 +73,10 @@ export class LinkMetadataParser {
 		if (title) return title;
 	}
 
+	/**
+	 * Extracts the page description from Open Graph or meta description tags.
+	 * @returns The page description or undefined if not found
+	 */
 	private getDescription(): string | undefined {
 		const ogDescription = this.htmlDoc
 			.querySelector("meta[property='og:description']")
@@ -62,6 +89,10 @@ export class LinkMetadataParser {
 		if (metaDescription) return metaDescription;
 	}
 
+	/**
+	 * Extracts the favicon URL from the link element.
+	 * @returns The resolved favicon URL or undefined if not found
+	 */
 	private async getFavicon(): Promise<string | undefined> {
 		const favicon = this.htmlDoc
 			.querySelector("link[rel='icon']")
@@ -69,6 +100,10 @@ export class LinkMetadataParser {
 		if (favicon) return await this.fixImageUrl(favicon);
 	}
 
+	/**
+	 * Extracts the Open Graph image URL.
+	 * @returns The resolved image URL or undefined if not found
+	 */
 	private async getImage(): Promise<string | undefined> {
 		const ogImage = this.htmlDoc
 			.querySelector("meta[property='og:image']")
@@ -76,6 +111,12 @@ export class LinkMetadataParser {
 		if (ogImage) return await this.fixImageUrl(ogImage);
 	}
 
+	/**
+	 * Resolves relative or protocol-relative image URLs to absolute URLs.
+	 * Tests accessibility via https first, then http.
+	 * @param url - The image URL to resolve
+	 * @returns The resolved absolute URL
+	 */
 	private async fixImageUrl(url: string | undefined): Promise<string> {
 		if (url === undefined) return "";
 		const { hostname } = new URL(this.url);
@@ -104,7 +145,11 @@ export class LinkMetadataParser {
 			}
 		}
 
-		// check if url is accessible via image element
+		/**
+		 * Checks if a URL is accessible by attempting to load it as an image.
+		 * @param url - The URL to check
+		 * @returns True if the image loads successfully
+		 */
 		async function checkUrlAccessibility(url: string): Promise<boolean> {
 			return new Promise((resolve) => {
 				const img = new Image();

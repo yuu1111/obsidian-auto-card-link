@@ -1,15 +1,33 @@
+/**
+ * @fileoverview Generator for creating cardlink code blocks from URLs.
+ * @module code_block_generator
+ */
+
 import { type Editor, Notice, requestUrl } from "obsidian";
 import { EditorExtensions } from "src/editor_enhancements";
 import type { LinkMetadata } from "src/interfaces";
 import { LinkMetadataParser } from "src/link_metadata_parser";
 
+/**
+ * Generates cardlink code blocks by fetching metadata from URLs.
+ */
 export class CodeBlockGenerator {
+	/** Reference to the Obsidian editor instance */
 	editor: Editor;
 
+	/**
+	 * Creates a new CodeBlockGenerator.
+	 * @param editor - The Obsidian editor instance
+	 */
 	constructor(editor: Editor) {
 		this.editor = editor;
 	}
 
+	/**
+	 * Converts a URL to a cardlink code block.
+	 * Shows a placeholder while fetching, then replaces with the code block.
+	 * @param url - The URL to convert
+	 */
 	async convertUrlToCodeBlock(url: string): Promise<void> {
 		const selectedText = this.editor.getSelection();
 
@@ -45,6 +63,11 @@ export class CodeBlockGenerator {
 		this.editor.replaceRange(this.genCodeBlock(linkMetadata), startPos, endPos);
 	}
 
+	/**
+	 * Generates the cardlink code block string from metadata.
+	 * @param linkMetadata - The metadata to include in the code block
+	 * @returns The formatted code block string
+	 */
 	genCodeBlock(linkMetadata: LinkMetadata): string {
 		const codeBlockTexts = ["\n```cardlink"];
 		codeBlockTexts.push(`url: ${linkMetadata.url}`);
@@ -59,6 +82,11 @@ export class CodeBlockGenerator {
 		return codeBlockTexts.join("\n");
 	}
 
+	/**
+	 * Fetches and parses metadata from a URL.
+	 * @param url - The URL to fetch metadata from
+	 * @returns The parsed metadata or undefined if fetch fails
+	 */
 	private async fetchLinkMetadata(
 		url: string,
 	): Promise<LinkMetadata | undefined> {
@@ -79,6 +107,10 @@ export class CodeBlockGenerator {
 		return parser.parse();
 	}
 
+	/**
+	 * Creates a random 4-character hash for unique placeholder identification.
+	 * @returns A random alphanumeric string
+	 */
 	private createBlockHash(): string {
 		let result = "";
 		const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
